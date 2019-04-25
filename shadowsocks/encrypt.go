@@ -45,10 +45,14 @@ func evpBytesToKey(password string, keyLen int) (key []byte) {
 	return m[:keyLen]
 }
 
+// DecOrEnc ...
 type DecOrEnc int
 
 const (
+	// Decrypt ...
 	Decrypt DecOrEnc = iota
+
+	// Encrypt ...
 	Encrypt
 )
 
@@ -59,9 +63,8 @@ func newStream(block cipher.Block, err error, key, iv []byte,
 	}
 	if doe == Encrypt {
 		return cipher.NewCFBEncrypter(block, iv), nil
-	} else {
-		return cipher.NewCFBDecrypter(block, iv), nil
 	}
+	return cipher.NewCFBDecrypter(block, iv), nil
 }
 
 func newAESCFBStream(key, iv []byte, doe DecOrEnc) (cipher.Stream, error) {
@@ -172,6 +175,7 @@ var cipherMethod = map[string]*cipherInfo{
 	"salsa20":       {32, 8, newSalsa20Stream},
 }
 
+// CheckCipherMethod ...
 func CheckCipherMethod(method string) error {
 	if method == "" {
 		method = "aes-256-cfb"
@@ -183,6 +187,7 @@ func CheckCipherMethod(method string) error {
 	return nil
 }
 
+// Cipher ...
 type Cipher struct {
 	enc  cipher.Stream
 	dec  cipher.Stream

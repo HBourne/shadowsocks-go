@@ -21,9 +21,9 @@ const (
 	typeDm   = 3 // type is domain address
 	typeIPv6 = 4 // type is ipv6 address
 
-	lenIPv4     = 1 + net.IPv4len + 2 // 1addrType + ipv4 + 2port
-	lenIPv6     = 1 + net.IPv6len + 2 // 1addrType + ipv6 + 2port
-	lenDmBase   = 1 + 1 + 2           // 1addrType + 1addrLen + 2port, plus addrLen
+	lenIPv4   = 1 + net.IPv4len + 2 // 1addrType + ipv4 + 2port
+	lenIPv6   = 1 + net.IPv6len + 2 // 1addrType + ipv6 + 2port
+	lenDmBase = 1 + 1 + 2           // 1addrType + 1addrLen + 2port, plus addrLen
 	// lenHmacSha1 = 10
 )
 
@@ -127,11 +127,12 @@ func parseHeaderFromAddr(addr net.Addr) ([]byte, int) {
 		iplen = net.IPv4len
 	}
 	copy(buf[1:], b1)
-	port_i, _ := strconv.Atoi(port)
-	binary.BigEndian.PutUint16(buf[1+iplen:], uint16(port_i))
+	portI, _ := strconv.Atoi(port)
+	binary.BigEndian.PutUint16(buf[1+iplen:], uint16(portI))
 	return buf[:1+iplen+2], 1 + iplen + 2
 }
 
+// Pipeloop ...
 func Pipeloop(write net.PacketConn, writeAddr net.Addr, readClose net.PacketConn, addTraffic func(int)) {
 	buf := leakyBuf.Get()
 	defer leakyBuf.Put(buf)
@@ -247,6 +248,7 @@ func handleUDPConnection(handle *SecurePacketConn, n int, src net.Addr, receive 
 	return
 }
 
+// ReadAndHandleUDPReq ...
 func ReadAndHandleUDPReq(c *SecurePacketConn, addTraffic func(int)) error {
 	buf := leakyBuf.Get()
 	n, src, err := c.ReadFrom(buf[0:])
